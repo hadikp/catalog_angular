@@ -7,6 +7,7 @@ import { Catalog } from '../common/catalog';
   providedIn: 'root',
 })
 export class CatalogService {
+    
   private httpClient = inject(HttpClient);
 
   private baseUrl = 'http://localhost:8080/catalog';
@@ -16,5 +17,11 @@ export class CatalogService {
     return this.httpClient.get<Catalog[]>(`${this.baseUrl}`);
   }
 
+  getCatalogById(catalogId: number): Observable<Catalog> {
+    return this.httpClient.get<Catalog>(`${this.baseUrl}/${catalogId}`);
+  }
 
+  updateCatalog(catalogId: number, catalog: Catalog) {
+    return this.httpClient.put(`${this.baseUrl}/${catalogId}`, catalog);
+  }
 }

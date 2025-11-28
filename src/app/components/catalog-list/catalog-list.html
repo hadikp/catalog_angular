@@ -1,25 +1,18 @@
 <div class="catalog-container">
   <h2>Katalógusok</h2>
-
   <!-- 1. Accordion szekció -->
   <div class="accordion-section">
-    
     <!-- Fejléc -->
     <div class="accordion-header" (click)="toggleSection(section[0])">
       {{ section[0].title }}
       <span class="arrow" [class.open]="section[0].open">▼</span>
     </div>
 
-    <!-- 2. Lenyitott tartalom (MODERN @if használatával) -->
     @if (section[0].open) {
       <div class="accordion-content">
-        
-        <!-- 3. Gomblista tároló -->
         <div class="button-list">
-          
-          <!-- CIKLUS -->
           @for (tempCatalog of catalogs; track tempCatalog.id) {
-            <button class="catalog-btn">
+            <button class="catalog-btn" [routerLink] = "['/catalog', tempCatalog.id]">
               {{ tempCatalog.name }}
             </button>
           } @empty {

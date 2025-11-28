@@ -1,0 +1,43 @@
+<div class="detail-container">
+  <!-- Fejléc -->
+  <div class="header-bar">
+    <h2>{{ catalog.name }}</h2>
+    <button class="btn btn-primary" (click)="goBack()">
+      <i class="bi bi-arrow-left"></i> Vissza</button>
+  </div>
+
+  <!-- Táblázat -->
+  <table class="catalog-table">
+    <thead>
+      <tr>
+        <th>Érték</th>
+        <th>Név</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (item of catalog.items; track item.id; let i = $index) {
+      <tr>
+        <td>
+          <input type="text" [(ngModel)]="item.value"/>
+        </td>
+        <td>
+          <input type="text" [(ngModel)]="item.name"/>
+        </td>
+        <td><button type="button" class="btn btn-outline-danger" (click)="removeItem(i)">
+          <i class="bi bi-trash"></i>
+        </button></td>
+      </tr>
+      } @empty {
+        <div class="empty-msg">Nincs megjeleníthető katalógus.</div>
+      }
+    </tbody>
+  </table>
+
+  <!-- Gombok -->
+  <div class="action-buttons">
+    <button class="cancel-btn" (click)="goBack()">Mégsem</button>
+    <button class="save-btn" (click)="saveChanges()">Mentés</button>
+  </div>
+</div>
+
