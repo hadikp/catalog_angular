@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { Catalog } from '../../common/catalog';
 import { CatalogService } from '../../services/catalog-service';
+import { CatalogItemService } from '../../services/catalog-item-service';
 
 @Component({
   selector: 'app-catalog-list-item',
@@ -22,8 +23,9 @@ export class CatalogListItem implements OnInit {
     description: ''
   };
 
-  constructor(private route: ActivatedRoute, private router: Router, private catalogService: CatalogService) {}
-
+  constructor(private route: ActivatedRoute, private router: Router,
+     private catalogService: CatalogService, private catalogItemService: CatalogItemService) {}
+  
   ngOnInit(): void {
     this.catalogId = Number(this.route.snapshot.paramMap.get('id'));
     this.catalogService.getCatalogById(this.catalogId).subscribe(data => {this.catalog = data});
@@ -34,22 +36,40 @@ export class CatalogListItem implements OnInit {
   }
 
   removeItem(index: number): void {
-    this.items.splice(index, 1);
+    const item = this.catalog.items[index];
+    if (item.id !== 0) {
+      this.catalogItemService.deleteItem(item.id).subscribe({
+        next: () => {
+          this.catalog.items.splice(index, 1);
+          alert('Elem törölve az adatbázisból!');
+        },
+        error: (err) => console.error('Hiba történt a törlés során!', err)
+      });
+    } else {
+      this.catalog.items.splice(index, 1);
+    }
   }
 
   addItem(): void {
-    this.catalog.items.push({
-      name: '', 
-      value: '',
-      id: 0
-    });
+    this.catalog.items.push({id: 0, value: '', name: '' });
   }
 
-  saveChanges() {
-    this.catalogService.updateCatalog(this.catalogId!, this.catalog!).subscribe(() => {
-      alert('Mentve');
-      this.goBack();
-    })
+  saveChanges(): void {
+    const newItems = this.catalog.items.filter(item => item.id === 0);
+    if (newItems.length === 0) {
+      alert('Nincs új elem mentésre.');
+      return;
+    }
+
+    newItems.forEach(item => {
+      this.catalogItemService.createItem({ ...item, catalogId: this.catalogId}).subscribe({
+        next: (resp) => {
+          item.id = resp.id;
+        },
+        error: (err) => console.log('Hiba történt a mentés során!', err)
+      });
+    });
+    alert('Új elem létrehozva!');
   }
 
 }
