@@ -3,7 +3,11 @@
   <div class="header-bar">
     <h2>{{ catalog.name }}</h2>
     <button class="btn btn-primary" (click)="goBack()">
-      <i class="bi bi-arrow-left"></i> Vissza</button>
+      <i class="bi bi-arrow-left"></i> Vissza
+    </button>
+    <button class="btn btn-outline-secondary ms-2" type="button" (click)="openHistory()">
+      <i class="bi bi-clock-history"></i> Módosítás történet
+    </button>
   </div>
 
   <!-- Táblázat -->
@@ -12,7 +16,7 @@
       <tr>
         <th>Érték</th>
         <th>Név</th>
-        <th></th>
+        <th>Műveletek</th>
       </tr>
     </thead>
     <tbody>
@@ -24,9 +28,11 @@
         <td>
           <input type="text" [(ngModel)]="item.name"/>
         </td>
-        <td><button type="button" class="btn btn-outline-danger" (click)="removeItem(i)">
+        <td style="white-space: nowrap;">
+          <button type="button" class="btn btn-outline-danger" (click)="removeItem(i)">
           <i class="bi bi-trash"></i>
-        </button></td>
+          </button>
+        </td>
       </tr>
       } @empty {
         <div class="empty-msg">Nincs megjeleníthető katalógus.</div>

@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { Catalog } from '../../common/catalog';
 import { CatalogService } from '../../services/catalog-service';
 import { CatalogItemService } from '../../services/catalog-item-service';
+import { MatDialog } from '@angular/material/dialog';
+import { HistoryDialog  } from '../../components/history-dialog/history-dialog';
 
 @Component({
   selector: 'app-catalog-list-item',
@@ -23,8 +25,8 @@ export class CatalogListItem implements OnInit {
     description: ''
   };
 
-  constructor(private route: ActivatedRoute, private router: Router,
-     private catalogService: CatalogService, private catalogItemService: CatalogItemService) {}
+  constructor(private route: ActivatedRoute, private router: Router, private catalogService: CatalogService,
+     private catalogItemService: CatalogItemService, private dialog: MatDialog) {}
   
   ngOnInit(): void {
     this.catalogId = Number(this.route.snapshot.paramMap.get('id'));
@@ -61,8 +63,12 @@ export class CatalogListItem implements OnInit {
       return;
     }
 
+    // Teljes lista összegyűjtése
+    const currentItemsList = this.catalog.items.map(item => ({ name: item.name, value: item.value }));
+
     newItems.forEach(item => {
-      this.catalogItemService.createItem({ ...item, catalogId: this.catalogId}).subscribe({
+      const payload = { ...item, catalogId: this.catalogId, currentItems: currentItemsList }
+      this.catalogItemService.createItem(payload).subscribe({
         next: (resp) => {
           item.id = resp.id;
         },
@@ -70,6 +76,22 @@ export class CatalogListItem implements OnInit {
       });
     });
     alert('Új elem létrehozva!');
+  }
+
+  openHistory(): void {
+    const id = this.catalogId;
+    // 1. Lekérjük a listát a backendről
+    if (!id) return;
+    this.catalogItemService.getHistory(id).subscribe({
+      next: (resp) => {
+        // resp = [ {name: 'Email', value: '1'}, ... ] (a JSON tömb)
+        const dialogRef = this.dialog.open(HistoryDialog, {
+          width: '900px',
+          data: resp, // Ez megy a táblázatba
+        });
+      },
+      error: (err) => console.error(err)
+      });
   }
 
 }

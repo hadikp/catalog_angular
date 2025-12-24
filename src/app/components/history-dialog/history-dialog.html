@@ -1,0 +1,74 @@
+<h2 mat-dialog-title>Módosítási történet</h2>
+
+<mat-dialog-content class="content">
+
+  <!-- Táblázat a paraméterek listázásához -->
+  <table class="table-full-width">
+    <thead>
+      <tr>
+        <th>Paraméter</th>
+        <th>Érték</th>
+        
+        <!-- ÚJ @if SZINTAXIS -->
+        <!-- Csak akkor rendereli le a TH elemet, ha van adat -->
+        @if (meta?.modifiedAt) {
+          <th>Módosítás ideje</th>
+        }
+        @if (meta?.modifiedBy) {
+          <th>Módosította</th>
+        }
+      </tr>
+    </thead>
+    <tbody>
+      @for (p of parameters; track p.id; let i = $index) {
+        <tr>
+          <td>
+            <div style="white-space: pre-wrap; max-height: 100px; overflow: auto;">{{ p.formattedText }}</div>
+          </td>
+          <td>{{ p.name }}</td>
+          <td>{{ p.value }}</td>
+          
+          <!-- ÚJ @if SZINTAXIS -->
+          <!-- A cellák is csak akkor jelennek meg, ha a fejléc is (adategyezés) -->
+          @if (meta?.modifiedAt) {
+            <td>{{ meta?.modifiedAt | date:'yyyy.MM.dd HH:mm' }}</td>
+          }
+          @if (meta?.modifiedBy) {
+            <td>{{ meta?.modifiedBy }}</td>
+          }
+        </tr>
+      } @empty {
+        <!-- HTML HIBA JAVÍTÁSA: 
+             A tbody-ba közvetlenül nem tehetsz div-et, csak tr-t. 
+             A colspan=4 biztosítja, hogy széles legyen az üzenet. -->
+        <tr>
+          <td colspan="4" class="empty-msg-cell">
+            <div class="empty-msg">Nincs megjeleníthető katalógus.</div>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+
+  <!-- Panelek: Új vs Régi érték -->
+  <div class="panels-container">
+
+    <!-- Bal oldal: ÚJ (Utolsó elem) -->
+    <div class="panel">
+      <div class="title">Módosítás erre (Új)</div>
+      <pre class="box new-value-box">{{ newValue }}</pre>
+    </div>
+
+    <!-- Jobb oldal: RÉGI (Utolsó előtti elem) -->
+    <div class="panel">
+      <div class="title">Erről módosult (Régi)</div>
+      <pre class="box old-value-box">{{ oldValue }}</pre>
+    </div>
+
+  </div>
+
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-stroked-button mat-dialog-close>Bezárás</button>
+</mat-dialog-actions>
